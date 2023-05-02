@@ -1,0 +1,10 @@
+{
+  "name": "mobile-order",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "https://github.com/jkl3848/mobile-order.git",
+  "author": "jlamoreaux",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module"
+}
