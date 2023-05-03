@@ -20,7 +20,8 @@ function verifyLogin() {
     id = userInfo.id;
     userType = userInfo.type;
 
-    var loginPath = `../vendor/${userType}/vendorMain.html`;
+    // var loginPath = `../vendor/${userType}/vendorMain.html`;
+    var loginPath = "../mockup/vendorTest.html";
 
     window.location.href = loginPath;
   } else {
