@@ -5,25 +5,27 @@ var loginButton = document.getElementById("login-button");
 loginButton.addEventListener("click", verifyLogin);
 
 function verifyLogin() {
-  var username = document.getElementById("login-field-username").value;
-  var password = document.getElementById("login-field-password").value;
-  var userType = "";
-  var id;
+  var loginPath = "../mockup/vendorTest.html";
 
-  console.log(username);
-  console.log(password);
+  window.location.href = loginPath;
+  // var username = document.getElementById("login-field-username").value;
+  // var password = document.getElementById("login-field-password").value;
+  // var userType = "";
+  // var id;
 
-  var userInfo = logins.find((obj) => obj.user === username);
+  // console.log(username);
+  // console.log(password);
 
-  console.log(userInfo);
-  if (userInfo.password === password) {
-    id = userInfo.id;
-    userType = userInfo.type;
+  // var userInfo = logins.find((obj) => obj.user === username);
 
-    // var loginPath = `../vendor/${userType}/vendorMain.html`;
-    var loginPath = "../mockup/vendorTest.html";
+  // console.log(userInfo);
+  // if (userInfo.password === password) {
+  //   id = userInfo.id;
+  //   userType = userInfo.type;
 
-    window.location.href = loginPath;
-  } else {
-  }
+  //   var loginPath = `../vendor/${userType}/vendorMain.html`;
+
+  //   window.location.href = loginPath;
+  // } else {
+  // }
 }
