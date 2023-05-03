@@ -1,4 +1,4 @@
-import { logins } from "../data/loginInfo.js";
+import { logins } from "../../data/loginInfo.js";
 
 var loginButton = document.getElementById("login-button");
 
@@ -20,7 +20,7 @@ function verifyLogin() {
     id = userInfo.id;
     userType = userInfo.type;
 
-    var loginPath = `../vendor/${userType}/vendormain.html`;
+    var loginPath = `../vendor/${userType}/vendorMain.html`;
 
     window.location.href = loginPath;
   } else {
