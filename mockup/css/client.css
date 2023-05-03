@@ -1,0 +1,18 @@
+#banner {
+  height: 80px;
+  width: 100%;
+  background-color: darkslategrey;
+}
+
+table {
+}
+
+td {
+  width: 80px;
+  height: 80px;
+  border: 1px solid black;
+}
+
+#order-confirmation {
+  display: none;
+}

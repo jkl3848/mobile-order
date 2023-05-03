@@ -3,12 +3,34 @@
   <head>
     <title>Mobile Ordering</title>
     <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/client.css" />
   </head>
   <body>
-    <script type="module" src="./js/login.js"></script>
+    <script type="module" src="./js/clientOrder.js"></script>
 
     <div id="content">
-      <div id="welcome">Welcome Client</div>
+      <div id="banner"></div>
+      <div id="welcome">Food Place</div>
+      <div>Estimated Wait Time: 12 minutes</div>
+
+      <div id="order-form">
+        <table>
+          <tr>
+            <td id="item1" class="order-item">item</td>
+            <td id="item2" class="order-item">item</td>
+          </tr>
+          <tr>
+            <td id="item3" class="order-item">item</td>
+            <td id="item4" class="order-item">item</td>
+          </tr>
+        </table>
+
+        <button id="confirm">ORDER</button>
+      </div>
+    </div>
+    <div id="order-confirmation">
+      Order Complete! Your order should be read in 12 minutes. We'll send you a
+      text when its ready.
     </div>
   </body>
 </html>
