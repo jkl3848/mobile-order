@@ -13,10 +13,10 @@ export default defineConfig({
       },
     }),
   ],
-  resolve: {
-    alias: {
-      vue: "vue/dist/vue.esm-bundler.js",
-    },
-    extensions: [".js", ".css"],
-  },
+  // resolve: {
+  //   alias: {
+  //     vue: "vue/dist/vue.esm-bundler.js",
+  //   },
+  //   extensions: [".js", ".css"],
+  // },
 });
