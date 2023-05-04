@@ -3,10 +3,6 @@ import VendorPortal from "../components/VendorPortal.vue";
 
 const routes = [
   {
-    path: "/",
-    redirect: "/vendorportal",
-  },
-  {
     path: "/vendorportal",
     name: "VendorPortal",
     component: VendorPortal,
