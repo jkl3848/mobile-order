@@ -3,7 +3,7 @@ import vue from "@vitejs/plugin-vue";
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
 export default defineConfig({
-  base: "/dist",
+  base: "/dist/",
   plugins: [vue({}), cssInjectedByJsPlugin()],
   // resolve: {
   //   alias: {
