@@ -1,7 +1,9 @@
 <script setup>
 import OrderItem from "./OrderItem.vue";
+import ActionMenu from "./ActionMenu.vue";
 
 var currentTime = $ref();
+var actionMenuOn = $ref(true);
 var test = $ref([
   {
     orderNumber: "00001",
@@ -30,6 +32,10 @@ var test = $ref([
     orderTime: "5:02:08",
   },
 ]);
+
+function toggleActionMenu() {
+  actionMenuOn = !actionMenuOn;
+}
 
 function sortedItemsList(list, isStarted) {
   var finalList;
@@ -79,8 +85,14 @@ setInterval(getTime, 1000);
 </script>
 
 <template>
-  <div id="content">
-    <div id="header">Welcome Vendor</div>
+  <ActionMenu v-if="actionMenuOn" />
+  <div id="content" :class="actionMenuOn ? 'blur' : ''">
+    <div id="header">
+      <span id="welcome-text">Welcome Vendor {{ currentTime }}</span>
+      <div id="action-button">
+        <button @click="toggleActionMenu()">*</button>
+      </div>
+    </div>
 
     <div
       v-if="sortedItemsList(test, true).length > 0"
@@ -164,5 +176,8 @@ setInterval(getTime, 1000);
 .item-started {
   border-color: rgb(48, 92, 195);
 }
+
+.blur {
+  filter: blur(8px) !important;
 }
 </style>
