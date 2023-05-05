@@ -8,7 +8,7 @@ const emit = defineEmits(["changeOrderStatus"]);
 <template>
   <div id="order-details">
     <span id="order-item">{{ order.item }}</span
-    ><span id="order-time">{{ order.orderTime }}</span>
+    ><span id="order-time">Time Ordered: {{ order.orderTime }}</span>
   </div>
   <div>
     <button
@@ -29,13 +29,23 @@ const emit = defineEmits(["changeOrderStatus"]);
 </template>
 <style scoped>
 #order-details {
-  width: 100%;
+  width: 95%;
   text-align: left;
-  font-size: 50px;
   padding-left: 20px;
-
+  padding-bottom: 5px;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+}
+
+#order-item {
+  font-size: 50px;
+}
+
+#order-time {
+  justify-content: right;
+  font-size: 20px;
+  margin: right;
 }
 
 .order-button {
@@ -56,13 +66,5 @@ const emit = defineEmits(["changeOrderStatus"]);
 #complete-button {
   background-color: rgb(38, 176, 84);
   border: 3px solid rgb(24, 109, 52);
-}
-
-.order-item {
-  justify-content: left;
-}
-
-.order-time {
-  justify-content: right;
 }
 </style>

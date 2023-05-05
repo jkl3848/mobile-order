@@ -1,32 +1,33 @@
 <script setup>
 import OrderItem from "./OrderItem.vue";
 
+var currentTime = $ref();
 var test = $ref([
   {
     orderNumber: "00001",
-    item: "food",
+    item: "Cheeseburger",
     name: "Steve",
     number: "100",
     status: "started",
-    orderTime: "5:00",
+    orderTime: "5:00:00",
   },
 
   {
     orderNumber: "00002",
-    item: "food",
+    item: "Cheeseburger",
     name: "John",
     number: "100",
     status: "ordered",
-    orderTime: "5:01",
+    orderTime: "5:00:37",
   },
 
   {
     orderNumber: "00003",
-    item: "drink",
+    item: "Soda",
     name: "Ted",
     number: "100",
     status: "ordered",
-    orderTime: "5:04",
+    orderTime: "5:02:08",
   },
 ]);
 
@@ -42,8 +43,6 @@ function sortedItemsList(list, isStarted) {
       return item.status === "started";
     });
   }
-
-  console.log(finalList);
 
   return finalList;
 }
@@ -62,17 +61,35 @@ function changeOrderStatus(item, status) {
   if (foundObj) {
     foundObj.status = status;
   }
-
-  console.log(test);
 }
+
+function getTime() {
+  var d = new Date();
+  var s = d.getSeconds();
+  var m = d.getMinutes();
+  var h = d.getHours();
+  currentTime =
+    ("0" + h).substr(-2) +
+    ":" +
+    ("0" + m).substr(-2) +
+    ":" +
+    ("0" + s).substr(-2);
+}
+setInterval(getTime, 1000);
 </script>
 
 <template>
   <div id="content">
     <div id="header">Welcome Vendor</div>
 
-    <div class="order-list" id="in-progress-orders">
-      Orders in Progress
+    <div
+      v-if="sortedItemsList(test, true).length > 0"
+      class="order-list"
+      id="in-progress-orders"
+    >
+      <span class="order-list-header"
+        >{{ sortedItemsList(test, true).length }} Orders in Progress</span
+      >
       <div
         v-for="item in sortedItemsList(test, true)"
         class="order-item-obj"
@@ -85,8 +102,14 @@ function changeOrderStatus(item, status) {
       </div>
     </div>
 
-    <div class="order-list" id="orders">
-      Orders
+    <div
+      v-if="sortedItemsList(test, false).length > 0"
+      class="order-list"
+      id="orders"
+    >
+      <span class="order-list-header"
+        >{{ sortedItemsList(test, false).length }} Orders Pending</span
+      >
       <div v-for="item in sortedItemsList(test, false)" class="order-item-obj">
         <OrderItem
           :order="item"
@@ -98,6 +121,22 @@ function changeOrderStatus(item, status) {
 </template>
 
 <style scoped>
+#header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#welcome-text {
+  justify-content: center;
+  margin-left: 42%;
+}
+
+#action-button {
+  justify-content: right;
+}
+
 #content {
   text-align: center;
   margin: auto;
@@ -110,14 +149,20 @@ function changeOrderStatus(item, status) {
   margin-top: 50px;
 }
 
+.order-list-header {
+  font-size: 60px;
+}
+
 .order-item-obj {
-  width: 100%;
-  border: 5px solid gray;
+  border: 3px solid gray;
   border-radius: 15px;
-  padding: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  box-shadow: 0px 0px 5px rgb(99, 99, 99);
 }
 
 .item-started {
-  border-color: blue;
+  border-color: rgb(48, 92, 195);
+}
 }
 </style>
