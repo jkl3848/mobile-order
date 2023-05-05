@@ -54,7 +54,7 @@ const emit = defineEmits(["changeOrderStatus"]);
   width: 250px;
   margin-left: 15px;
   margin-right: 15px;
-  border-radius: 12px;
+  border-radius: 30px;
   font-size: 20px;
 }
 

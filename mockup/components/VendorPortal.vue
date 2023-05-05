@@ -1,9 +1,10 @@
 <script setup>
+import { onMounted, watch } from "vue";
 import OrderItem from "./OrderItem.vue";
 import ActionMenu from "./ActionMenu.vue";
 
-var currentTime = $ref();
-var actionMenuOn = $ref(true);
+var actionMenuOn = $ref(false);
+var waitTime = $ref(0);
 var test = $ref([
   {
     orderNumber: "00001",
@@ -19,7 +20,7 @@ var test = $ref([
     item: "Cheeseburger",
     name: "John",
     number: "100",
-    status: "ordered",
+    status: "started",
     orderTime: "5:00:37",
   },
 
@@ -31,22 +32,42 @@ var test = $ref([
     status: "ordered",
     orderTime: "5:02:08",
   },
+  {
+    orderNumber: "00004",
+    item: "Soda",
+    name: "Sarah",
+    number: "100",
+    status: "ordered",
+    orderTime: "5:02:55",
+  },
+  {
+    orderNumber: "00005",
+    item: "Cheeseburger",
+    name: "Alex",
+    number: "100",
+    status: "ordered",
+    orderTime: "5:04:023",
+  },
 ]);
 
 function toggleActionMenu() {
   actionMenuOn = !actionMenuOn;
 }
 
-function sortedItemsList(list, isStarted) {
+function sortedItemsList(list, itemStatus) {
   var finalList;
 
-  if (!isStarted) {
+  if (itemStatus == "ordered") {
     finalList = list.filter((item) => {
       return item.status === "ordered";
     });
-  } else {
+  } else if (itemStatus == "started") {
     finalList = list.filter((item) => {
       return item.status === "started";
+    });
+  } else if (itemStatus == "allInProg") {
+    finalList = list.filter((item) => {
+      return item.status !== "completed";
     });
   }
 
@@ -68,42 +89,43 @@ function changeOrderStatus(item, status) {
     foundObj.status = status;
   }
 }
+watch(
+  () => test,
+  (newVal, oldVal) => {
+    waitTime = Math.ceil(sortedItemsList(test, "allInProg").length * 0.5);
+  },
+  { deep: true }
+);
 
-function getTime() {
-  var d = new Date();
-  var s = d.getSeconds();
-  var m = d.getMinutes();
-  var h = d.getHours();
-  currentTime =
-    ("0" + h).substr(-2) +
-    ":" +
-    ("0" + m).substr(-2) +
-    ":" +
-    ("0" + s).substr(-2);
-}
-setInterval(getTime, 1000);
+onMounted(() => {
+  waitTime = Math.ceil(test.length * 0.5);
+});
 </script>
 
 <template>
   <ActionMenu v-if="actionMenuOn" @close-action-menu="toggleActionMenu" />
-  <div id="content" :class="actionMenuOn ? 'blur' : ''">
-    <div id="header">
-      <span id="welcome-text">Welcome Vendor {{ currentTime }}</span>
-      <div id="action-button">
-        <button @click="toggleActionMenu()">*</button>
-      </div>
+  <div id="header">
+    <div>
+      <span id="welcome-text">Welcome Vendor</span>
+      <span>
+        Est. Wait Time: {{ waitTime }} minute{{ waitTime > 1 ? "s" : "" }}</span
+      >
     </div>
-
+    <div id="action-button">
+      <button @click="toggleActionMenu()">*</button>
+    </div>
+  </div>
+  <div id="content" :class="actionMenuOn ? 'blur' : ''">
     <div
-      v-if="sortedItemsList(test, true).length > 0"
+      v-if="sortedItemsList(test, 'started').length > 0"
       class="order-list"
       id="in-progress-orders"
     >
       <span class="order-list-header"
-        >{{ sortedItemsList(test, true).length }} Orders in Progress</span
+        >{{ sortedItemsList(test, "started").length }} Orders in Progress</span
       >
       <div
-        v-for="item in sortedItemsList(test, true)"
+        v-for="item in sortedItemsList(test, 'started')"
         class="order-item-obj"
         :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'"
       >
@@ -115,14 +137,17 @@ setInterval(getTime, 1000);
     </div>
 
     <div
-      v-if="sortedItemsList(test, false).length > 0"
+      v-if="sortedItemsList(test, 'ordered').length > 0"
       class="order-list"
       id="orders"
     >
       <span class="order-list-header"
-        >{{ sortedItemsList(test, false).length }} Orders Pending</span
+        >{{ sortedItemsList(test, "ordered").length }} Orders Pending</span
       >
-      <div v-for="item in sortedItemsList(test, false)" class="order-item-obj">
+      <div
+        v-for="item in sortedItemsList(test, 'ordered')"
+        class="order-item-obj"
+      >
         <OrderItem
           :order="item"
           @change-order-status="changeOrderStatus($event[0], $event[1])"
@@ -130,14 +155,41 @@ setInterval(getTime, 1000);
       </div>
     </div>
   </div>
+  <div id="footer">
+    <button class="footer-button" id="manual-order-button">Manual Order</button>
+    <button class="footer-button" id="pause-order-button">Pause Orders</button>
+  </div>
 </template>
 
 <style scoped>
+#content {
+  text-align: center;
+  margin: auto;
+  margin-top: 0px;
+  width: 80%;
+  background-color: white;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
 #header {
+  height: 80px;
+  background-color: rgb(38, 176, 84);
   width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+#footer {
+  height: 80px;
+  background-color: gray;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  position: fixed;
+  bottom: 0px;
+  z-index: 100;
 }
 
 #welcome-text {
@@ -147,14 +199,6 @@ setInterval(getTime, 1000);
 
 #action-button {
   justify-content: right;
-}
-
-#content {
-  text-align: center;
-  margin: auto;
-  width: 80%;
-  background-color: white;
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
 .order-list {
@@ -179,5 +223,25 @@ setInterval(getTime, 1000);
 
 .blur {
   filter: blur(8px) !important;
+}
+
+.footer-button {
+  color: white;
+  height: 60px;
+  width: 350px;
+  margin-left: 15px;
+  margin-right: 15px;
+  border-radius: 30px;
+  font-size: 20px;
+}
+
+#pause-order-button {
+  background-color: rgb(255, 139, 71);
+  border: 3px solid rgb(170, 92, 47);
+}
+
+#manual-order-button {
+  background-color: rgb(55, 189, 193);
+  border: 3px solid rgb(34, 116, 119);
 }
 </style>

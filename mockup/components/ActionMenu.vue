@@ -8,6 +8,13 @@ const emit = defineEmits(["closeActionMenu"]);
         <span id="header-text">Action Menu</span>
         <button id="close-button" @click="emit('closeActionMenu')">X</button>
       </div>
+      <div>
+        Actions
+        <ul>
+          <li>See Analytics</li>
+          <li>Close Store (End Session)</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
