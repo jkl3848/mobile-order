@@ -85,7 +85,7 @@ setInterval(getTime, 1000);
 </script>
 
 <template>
-  <ActionMenu v-if="actionMenuOn" />
+  <ActionMenu v-if="actionMenuOn" @close-action-menu="toggleActionMenu" />
   <div id="content" :class="actionMenuOn ? 'blur' : ''">
     <div id="header">
       <span id="welcome-text">Welcome Vendor {{ currentTime }}</span>
