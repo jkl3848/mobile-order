@@ -1,80 +1,97 @@
 <script setup>
-import OrderItem from "./OrderItem.vue"
+import OrderItem from "./OrderItem.vue";
 
-var test = [
+var test = $ref([
   {
-    "orderNumber": "00001",
-    "item": "food",
-    "name": "Steve",
-    "number": "100",
-    "status": "started",
-    "orderTime": "5:00"
+    orderNumber: "00001",
+    item: "food",
+    name: "Steve",
+    number: "100",
+    status: "started",
+    orderTime: "5:00",
   },
 
   {
-    "orderNumber": "00002",
-    "item": "food",
-    "name": "John",
-    "number": "100",
-    "status": "ordered",
-    "orderTime": "5:01"
+    orderNumber: "00002",
+    item: "food",
+    name: "John",
+    number: "100",
+    status: "ordered",
+    orderTime: "5:01",
   },
 
   {
-    "orderNumber": "00003",
-    "item": "drink",
-    "name": "Ted",
-    "number": "100",
-    "status": "ordered",
-    "orderTime": "5:04"
-  }
-]
+    orderNumber: "00003",
+    item: "drink",
+    name: "Ted",
+    number: "100",
+    status: "ordered",
+    orderTime: "5:04",
+  },
+]);
 
 function sortedItemsList(list, isStarted) {
-  var finalList
+  var finalList;
 
   if (!isStarted) {
     finalList = list.filter((item) => {
-      return item.status === "ordered"
-    })
+      return item.status === "ordered";
+    });
   } else {
     finalList = list.filter((item) => {
-      return item.status === "started"
-    })
+      return item.status === "started";
+    });
   }
 
-  console.log(finalList)
+  console.log(finalList);
 
-  return finalList
+  return finalList;
 }
-
 
 function orderIsStarted(item) {
   if (item.status === "started") {
-    return true
+    return true;
   }
-  return false
+  return false;
+}
+
+function changeOrderStatus(item, status) {
+  console.log("Changing item to " + status);
+  let foundObj = test.find((obj) => obj.orderNumber === item.orderNumber);
+
+  if (foundObj) {
+    foundObj.status = status;
+  }
+
+  console.log(test);
 }
 </script>
 
 <template>
   <div id="content">
-    <div id="header">
-      Welcome Vendor
-    </div>
+    <div id="header">Welcome Vendor</div>
 
     <div class="order-list" id="in-progress-orders">
       Orders in Progress
-      <div v-for="item in sortedItemsList(test, true)" class="order-item-obj"
-        :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'">
-        <OrderItem :order="item" />
+      <div
+        v-for="item in sortedItemsList(test, true)"
+        class="order-item-obj"
+        :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'"
+      >
+        <OrderItem
+          :order="item"
+          @change-order-status="changeOrderStatus($event[0], $event[1])"
+        />
       </div>
     </div>
 
     <div class="order-list" id="orders">
       Orders
       <div v-for="item in sortedItemsList(test, false)" class="order-item-obj">
-        <OrderItem :order="item" />
+        <OrderItem
+          :order="item"
+          @change-order-status="changeOrderStatus($event[0], $event[1])"
+        />
       </div>
     </div>
   </div>
@@ -97,10 +114,10 @@ function orderIsStarted(item) {
   width: 100%;
   border: 5px solid gray;
   border-radius: 15px;
-  padding: 5px
+  padding: 5px;
 }
 
 .item-started {
-  border-color: blue
+  border-color: blue;
 }
 </style>
