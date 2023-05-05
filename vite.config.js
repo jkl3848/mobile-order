@@ -4,7 +4,12 @@ import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
 export default defineConfig({
   base: "./",
-  plugins: [vue({}), cssInjectedByJsPlugin()],
+  plugins: [
+    vue({
+      reactivityTransform: true,
+    }),
+    cssInjectedByJsPlugin(),
+  ],
   // resolve: {
   //   alias: {
   //     vue: "vue/dist/vue.esm-bundler.js",
