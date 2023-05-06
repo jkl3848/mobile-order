@@ -9,11 +9,11 @@ const router = useRouter();
 // const fs = require("fs");
 // const path = require("path");
 
-onMounted(() => {
-  router.push({
-    name: "VendorPortal",
-  });
-});
+// onMounted(() => {
+//   router.push({
+//     name: "VendorPortal",
+//   });
+// });
 </script>
 
 <template>
