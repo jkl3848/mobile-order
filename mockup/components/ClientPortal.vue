@@ -1,5 +1,8 @@
 <script setup>
 
+var phoneNumber = $ref("")
+var invalidNumber = $ref(false)
+
 const orderItemList = $ref([
     {
         "itemName": "Cheeseburger",
@@ -31,6 +34,31 @@ function selectItem(itemIndex) {
     if (!skip) {
         orderItemList[itemIndex].selected = true
     }
+}
+
+function phoneVerification() {
+    var workingNumber = phoneNumber
+
+    if ((/\(\d\d\d\)\d\d\d\-\d\d\d\d/).test(workingNumber)) {
+        invalidNumber = false
+        return
+    }
+
+    if (workingNumber.length > 10 || workingNumber.length < 10) {
+        console.log(workingNumber.length)
+        invalidNumber = true
+        return
+    }
+    else if (!(/^\d+$/).test(workingNumber)) {
+        console.log((/^\d+$/).test(workingNumber))
+        invalidNumber = true
+        return
+    }
+
+    workingNumber = "(" + workingNumber.substr(0, 3) + ")" + workingNumber.substr(3, 3) + "-" + workingNumber.substr(6)
+
+    phoneNumber = workingNumber
+    invalidNumber = false
 }
 </script>
 
@@ -68,7 +96,8 @@ function selectItem(itemIndex) {
                 </div>
                 <div class="info-group">
                     <label class="user-input-label">Phone Number: </label>
-                    <input type="text" class="user-input" />
+                    <input type="text" class="user-input" :class="invalidNumber ? 'invalid' : ''" v-model="phoneNumber"
+                        @input="phoneVerification()" placeholder="(___)___-____" maxlength="13" />
                 </div>
 
                 <button>Submit</button>
@@ -144,5 +173,9 @@ td.selected {
     display: flex;
     flex-direction: column;
     margin: auto;
+}
+
+.invalid {
+    border: 1px solid red;
 }
 </style>
