@@ -108,53 +108,30 @@ onMounted(() => {
     <div>
       <span id="welcome-text">Welcome Vendor</span>
       <span>
-        Est. Wait Time: {{ waitTime }} minute{{ waitTime > 1 ? "s" : "" }}</span
-      >
+        Est. Wait Time: {{ waitTime }} minute{{ waitTime > 1 ? "s" : "" }}</span>
     </div>
     <div id="action-button">
       <button @click="toggleActionMenu()">*</button>
     </div>
   </div>
+
   <div id="content" :class="actionMenuOn ? 'blur' : ''">
-    <div
-      v-if="sortedItemsList(test, 'started').length > 0"
-      class="order-list"
-      id="in-progress-orders"
-    >
-      <span class="order-list-header"
-        >{{ sortedItemsList(test, "started").length }} Orders in Progress</span
-      >
-      <div
-        v-for="item in sortedItemsList(test, 'started')"
-        class="order-item-obj"
-        :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'"
-      >
-        <OrderItem
-          :order="item"
-          @change-order-status="changeOrderStatus($event[0], $event[1])"
-        />
+    <div v-if="sortedItemsList(test, 'started').length > 0" class="order-list" id="in-progress-orders">
+      <span class="order-list-header">{{ sortedItemsList(test, "started").length }} Orders in Progress</span>
+      <div v-for="item in sortedItemsList(test, 'started')" class="order-item-obj"
+        :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'" :key="item.orderNumber">
+        <OrderItem :order="item" @change-order-status="changeOrderStatus($event[0], $event[1])" />
       </div>
     </div>
 
-    <div
-      v-if="sortedItemsList(test, 'ordered').length > 0"
-      class="order-list"
-      id="orders"
-    >
-      <span class="order-list-header"
-        >{{ sortedItemsList(test, "ordered").length }} Orders Pending</span
-      >
-      <div
-        v-for="item in sortedItemsList(test, 'ordered')"
-        class="order-item-obj"
-      >
-        <OrderItem
-          :order="item"
-          @change-order-status="changeOrderStatus($event[0], $event[1])"
-        />
+    <div v-if="sortedItemsList(test, 'ordered').length > 0" class="order-list" id="orders">
+      <span class="order-list-header">{{ sortedItemsList(test, "ordered").length }} Orders Pending</span>
+      <div v-for="item in sortedItemsList(test, 'ordered')" class="order-item-obj" :key="item.orderNumber">
+        <OrderItem :order="item" @change-order-status="changeOrderStatus($event[0], $event[1])" />
       </div>
     </div>
   </div>
+
   <div id="footer">
     <button class="footer-button" id="manual-order-button">Manual Order</button>
     <button class="footer-button" id="pause-order-button">Pause Orders</button>
@@ -162,15 +139,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-#content {
-  text-align: center;
-  margin: auto;
-  margin-top: 0px;
-  width: 80%;
-  background-color: white;
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-}
-
 #header {
   height: 80px;
   background-color: rgb(38, 176, 84);
@@ -178,6 +146,19 @@ onMounted(() => {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+#content {
+  text-align: center;
+  margin: auto;
+  margin-top: 0px;
+  width: 80%;
+  background-color: white;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  padding-top: 1px;
+  padding-bottom: 85px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 #footer {
@@ -202,7 +183,7 @@ onMounted(() => {
 }
 
 .order-list {
-  margin-top: 50px;
+  margin-top: 30px;
 }
 
 .order-list-header {
@@ -229,8 +210,7 @@ onMounted(() => {
   color: white;
   height: 60px;
   width: 350px;
-  margin-left: 15px;
-  margin-right: 15px;
+  margin: auto;
   border-radius: 30px;
   font-size: 20px;
 }
