@@ -33,17 +33,23 @@ function verifyLogin() {
     // }
 }
 
-onMounted(() => {
+function gotToClient() {
+    router.push({
+        name: "ClientPortal",
+    });
+}
 
-    var loginButton = document.getElementById("login-button");
-    loginButton.addEventListener("click", verifyLogin);
-})
+// onMounted(() => {
+
+//     var loginButton = document.getElementById("login-button");
+//     loginButton.addEventListener("click", verifyLogin);
+// })
 
 </script>
 
 <template>
     <div id="content">
-        <div id="welcome">Welcome to the APS Mobile Order System</div>
+        <!-- <div id="welcome">Welcome to the APS Mobile Order System</div>
 
         <div id="login-area">
             <label for="login-field-username">Username:</label>
@@ -52,8 +58,25 @@ onMounted(() => {
             <input class="login-field" type="password" id="login-field-password" />
 
             <button id="login-button">Login</button>
+        </div> -->
+        <div>
+            <button @click="verifyLogin()">Vendor</button>
+            <button @click="gotToClient()">Client</button>
         </div>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+#content {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+button {
+    height: 60px;
+    width: 350px;
+    margin: auto;
+    border-radius: 30px;
+    font-size: 20px;
+}
+</style>

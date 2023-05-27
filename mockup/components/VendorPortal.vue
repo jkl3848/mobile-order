@@ -1,73 +1,101 @@
 <script setup>
-import { onMounted, watch } from "vue";
+import { onBeforeMount, onMounted, watch } from "vue";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
+
 import OrderItem from "./OrderItem.vue";
 import ActionMenu from "./ActionMenu.vue";
 
+const db = getFirestore();
+const citiesRef = collection(db, "order-list");
+
 var actionMenuOn = $ref(false);
 var waitTime = $ref(0);
-var test = $ref([
-  {
-    orderNumber: "00001",
-    item: "Cheeseburger",
-    name: "Steve",
-    number: "100",
-    status: "started",
-    orderTime: "5:00:00",
-  },
+var vendorID = "0001";
+var listOfOrders = $ref([]);
 
-  {
-    orderNumber: "00002",
-    item: "Cheeseburger",
-    name: "John",
-    number: "100",
-    status: "started",
-    orderTime: "5:00:37",
-  },
+// var test = $ref([
+//   {
+//     orderNumber: "00001",
+//     item: "Cheeseburger",
+//     name: "Steve",
+//     number: "100",
+//     status: "started",
+//     orderTime: "5:00:00",
+//   },
 
-  {
-    orderNumber: "00003",
-    item: "Soda",
-    name: "Ted",
-    number: "100",
-    status: "ordered",
-    orderTime: "5:02:08",
-  },
-  {
-    orderNumber: "00004",
-    item: "Soda",
-    name: "Sarah",
-    number: "100",
-    status: "ordered",
-    orderTime: "5:02:55",
-  },
-  {
-    orderNumber: "00005",
-    item: "Cheeseburger",
-    name: "Alex",
-    number: "100",
-    status: "ordered",
-    orderTime: "5:04:023",
-  },
-]);
+//   {
+//     orderNumber: "00002",
+//     item: "Cheeseburger",
+//     name: "John",
+//     number: "100",
+//     status: "started",
+//     orderTime: "5:00:37",
+//   },
+
+//   {
+//     orderNumber: "00003",
+//     item: "Soda",
+//     name: "Ted",
+//     number: "100",
+//     status: "ordered",
+//     orderTime: "5:02:08",
+//   },
+//   {
+//     orderNumber: "00004",
+//     item: "Soda",
+//     name: "Sarah",
+//     number: "100",
+//     status: "ordered",
+//     orderTime: "5:02:55",
+//   },
+//   {
+//     orderNumber: "00005",
+//     item: "Cheeseburger",
+//     name: "Alex",
+//     number: "100",
+//     status: "ordered",
+//     orderTime: "5:04:023",
+//   },
+// ]);
 
 function toggleActionMenu() {
   actionMenuOn = !actionMenuOn;
 }
 
 function sortedItemsList(list, itemStatus) {
+  console.log(list);
   var finalList;
+
+  list.sort((a, b) => {
+    const timeA = a.orderTime ? a.orderTime.split(':') : [];
+    const timeB = b.orderTime ? b.orderTime.split(':') : [];
+
+    for (let i = 0; i < 3; i++) {
+      const valueA = Number(timeA[i]) || 0;
+      const valueB = Number(timeB[i]) || 0;
+
+      if (valueA !== valueB) {
+        return valueA - valueB;
+      }
+    }
+
+    return 0;
+  });
+
+  console.log(list)
 
   if (itemStatus == "ordered") {
     finalList = list.filter((item) => {
-      return item.status === "ordered";
+      return item.itemStatus === "ordered";
     });
   } else if (itemStatus == "started") {
     finalList = list.filter((item) => {
-      return item.status === "started";
+      return item.itemStatus === "started";
     });
   } else if (itemStatus == "allInProg") {
     finalList = list.filter((item) => {
-      return item.status !== "completed";
+      return item.itemStatus !== "completed";
     });
   }
 
@@ -75,7 +103,7 @@ function sortedItemsList(list, itemStatus) {
 }
 
 function orderIsStarted(item) {
-  if (item.status === "started") {
+  if (item.itemStatus === "started") {
     return true;
   }
   return false;
@@ -83,22 +111,37 @@ function orderIsStarted(item) {
 
 function changeOrderStatus(item, status) {
   console.log("Changing item to " + status);
-  let foundObj = test.find((obj) => obj.orderNumber === item.orderNumber);
+  let foundObj = listOfOrders.find((obj) => obj.orderID === item.orderID);
 
   if (foundObj) {
-    foundObj.status = status;
+    foundObj.itemStatus = status;
   }
 }
 watch(
-  () => test,
+  () => listOfOrders,
   (newVal, oldVal) => {
-    waitTime = Math.ceil(sortedItemsList(test, "allInProg").length * 0.5);
+    waitTime = Math.ceil(
+      sortedItemsList(listOfOrders, "allInProg").length * 0.5
+    );
   },
   { deep: true }
 );
 
 onMounted(() => {
-  waitTime = Math.ceil(test.length * 0.5);
+  waitTime = Math.ceil(sortedItemsList(listOfOrders, "allInProg").length * 0.5);
+});
+
+onBeforeMount(async () => {
+  var q = query(citiesRef, where("vendor", "==", "0001"));
+
+  var holder = await getDocs(q);
+  holder.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    console.log(doc.id, " => ", doc.data());
+    listOfOrders.push(doc.data());
+  });
+
+  console.log(listOfOrders);
 });
 </script>
 
@@ -116,17 +159,19 @@ onMounted(() => {
   </div>
 
   <div id="content" :class="actionMenuOn ? 'blur' : ''">
-    <div v-if="sortedItemsList(test, 'started').length > 0" class="order-list" id="in-progress-orders">
-      <span class="order-list-header">{{ sortedItemsList(test, "started").length }} Orders in Progress</span>
-      <div v-for="item in sortedItemsList(test, 'started')" class="order-item-obj"
-        :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'" :key="item.orderNumber">
+    <div v-if="sortedItemsList(listOfOrders, 'started').length > 0" class="order-list" id="in-progress-orders">
+      <span class="order-list-header">{{ sortedItemsList(listOfOrders, "started").length }} Orders in
+        Progress</span>
+      <div v-for="item in sortedItemsList(listOfOrders, 'started')" class="order-item-obj"
+        :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'" :key="item.orderID">
         <OrderItem :order="item" @change-order-status="changeOrderStatus($event[0], $event[1])" />
       </div>
     </div>
 
-    <div v-if="sortedItemsList(test, 'ordered').length > 0" class="order-list" id="orders">
-      <span class="order-list-header">{{ sortedItemsList(test, "ordered").length }} Orders Pending</span>
-      <div v-for="item in sortedItemsList(test, 'ordered')" class="order-item-obj" :key="item.orderNumber">
+    <div v-if="sortedItemsList(listOfOrders, 'ordered').length > 0" class="order-list" id="orders">
+      <span class="order-list-header">{{ sortedItemsList(listOfOrders, "ordered").length }} Orders
+        Pending</span>
+      <div v-for="item in sortedItemsList(listOfOrders, 'ordered')" class="order-item-obj" :key="item.orderID">
         <OrderItem :order="item" @change-order-status="changeOrderStatus($event[0], $event[1])" />
       </div>
     </div>
