@@ -6,7 +6,7 @@ const db = getFirestore();
 
 var phoneNumber = $ref("");
 var invalidNumber = $ref(false);
-var itemForOrder = $ref("Burger");
+var itemForOrder = $ref("Cheeseburger");
 var userName = $ref("");
 
 var vendorID = "0001";
@@ -17,13 +17,13 @@ const orderItemList = $ref([
     itemName: "Cheeseburger",
     itemNumber: "01",
     imagePath: "../mockup/images/cheeseburger.jpg",
-    selected: false,
+    selected: true,
   },
   {
     itemName: "Drink",
     itemNumber: "02",
     imagePath: "../mockup/images/drink.jpg",
-    selected: true,
+    selected: false,
   },
   {
     itemName: "Secret Item",
@@ -44,6 +44,11 @@ function selectItem(itemIndex) {
   if (!skip) {
     orderItemList[itemIndex].selected = true;
   }
+
+  const selectedObject = orderItemList.find(obj => obj.selected === true);
+  console.log(selectedObject)
+  itemForOrder = selectedObject.itemName
+
 }
 
 function phoneVerification() {
@@ -84,13 +89,19 @@ async function submitOrder() {
       orderName: userName,
       phoneNumber: phoneNumber,
       itemStatus: "ordered",
-      orderTime: "5:00:00",
+      orderTime: getCurrentTime(),
     });
     console.log("Document written with ID: ", docRef.id);
     orderID++;
   } catch (e) {
     console.error("Error adding document: ", e);
   }
+}
+
+function getCurrentTime() {
+  const now = new Date();
+  const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+  return timeString;
 }
 </script>
 
@@ -103,26 +114,16 @@ async function submitOrder() {
       <table>
         <tbody>
           <tr v-for="(item, index) in orderItemList" :key="item.itemNumber">
-            <td
-              v-if="index % 2 === 0"
-              @click="selectItem(index)"
-              :class="item.selected ? 'selected' : ''"
-            >
+            <td v-if="index % 2 === 0" @click="selectItem(index)" :class="item.selected ? 'selected' : ''">
               <div class="item-select">
                 <img :src="item.imagePath" class="item-image" />
                 <span>{{ item.itemName }}</span>
               </div>
             </td>
-            <td
-              v-if="index % 2 === 0 && index < orderItemList.length - 1"
-              @click="selectItem(index + 1)"
-              :class="orderItemList[index + 1].selected ? 'selected' : ''"
-            >
+            <td v-if="index % 2 === 0 && index < orderItemList.length - 1" @click="selectItem(index + 1)"
+              :class="orderItemList[index + 1].selected ? 'selected' : ''">
               <div class="item-select">
-                <img
-                  :src="orderItemList[index + 1].imagePath"
-                  class="item-image"
-                />
+                <img :src="orderItemList[index + 1].imagePath" class="item-image" />
                 <span>{{ orderItemList[index + 1].itemName }}</span>
               </div>
             </td>
@@ -136,15 +137,8 @@ async function submitOrder() {
         </div>
         <div class="info-group">
           <label class="user-input-label">Phone Number: </label>
-          <input
-            type="text"
-            class="user-input"
-            :class="invalidNumber ? 'invalid' : ''"
-            v-model="phoneNumber"
-            @input="phoneVerification()"
-            placeholder="(___)___-____"
-            maxlength="13"
-          />
+          <input type="text" class="user-input" :class="invalidNumber ? 'invalid' : ''" v-model="phoneNumber"
+            @input="phoneVerification()" placeholder="(___)___-____" maxlength="13" />
         </div>
 
         <button @click="submitOrder()">Submit</button>
