@@ -67,6 +67,24 @@ function sortedItemsList(list, itemStatus) {
   console.log(list);
   var finalList;
 
+  list.sort((a, b) => {
+    const timeA = a.orderTime ? a.orderTime.split(':') : [];
+    const timeB = b.orderTime ? b.orderTime.split(':') : [];
+
+    for (let i = 0; i < 3; i++) {
+      const valueA = Number(timeA[i]) || 0;
+      const valueB = Number(timeB[i]) || 0;
+
+      if (valueA !== valueB) {
+        return valueA - valueB;
+      }
+    }
+
+    return 0;
+  });
+
+  console.log(list)
+
   if (itemStatus == "ordered") {
     finalList = list.filter((item) => {
       return item.itemStatus === "ordered";
@@ -133,8 +151,7 @@ onBeforeMount(async () => {
     <div>
       <span id="welcome-text">Welcome Vendor</span>
       <span>
-        Est. Wait Time: {{ waitTime }} minute{{ waitTime > 1 ? "s" : "" }}</span
-      >
+        Est. Wait Time: {{ waitTime }} minute{{ waitTime > 1 ? "s" : "" }}</span>
     </div>
     <div id="action-button">
       <button @click="toggleActionMenu()">*</button>
@@ -142,46 +159,20 @@ onBeforeMount(async () => {
   </div>
 
   <div id="content" :class="actionMenuOn ? 'blur' : ''">
-    <div
-      v-if="sortedItemsList(listOfOrders, 'started').length > 0"
-      class="order-list"
-      id="in-progress-orders"
-    >
-      <span class="order-list-header"
-        >{{ sortedItemsList(listOfOrders, "started").length }} Orders in
-        Progress</span
-      >
-      <div
-        v-for="item in sortedItemsList(listOfOrders, 'started')"
-        class="order-item-obj"
-        :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'"
-        :key="item.orderID"
-      >
-        <OrderItem
-          :order="item"
-          @change-order-status="changeOrderStatus($event[0], $event[1])"
-        />
+    <div v-if="sortedItemsList(listOfOrders, 'started').length > 0" class="order-list" id="in-progress-orders">
+      <span class="order-list-header">{{ sortedItemsList(listOfOrders, "started").length }} Orders in
+        Progress</span>
+      <div v-for="item in sortedItemsList(listOfOrders, 'started')" class="order-item-obj"
+        :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'" :key="item.orderID">
+        <OrderItem :order="item" @change-order-status="changeOrderStatus($event[0], $event[1])" />
       </div>
     </div>
 
-    <div
-      v-if="sortedItemsList(listOfOrders, 'ordered').length > 0"
-      class="order-list"
-      id="orders"
-    >
-      <span class="order-list-header"
-        >{{ sortedItemsList(listOfOrders, "ordered").length }} Orders
-        Pending</span
-      >
-      <div
-        v-for="item in sortedItemsList(listOfOrders, 'ordered')"
-        class="order-item-obj"
-        :key="item.orderID"
-      >
-        <OrderItem
-          :order="item"
-          @change-order-status="changeOrderStatus($event[0], $event[1])"
-        />
+    <div v-if="sortedItemsList(listOfOrders, 'ordered').length > 0" class="order-list" id="orders">
+      <span class="order-list-header">{{ sortedItemsList(listOfOrders, "ordered").length }} Orders
+        Pending</span>
+      <div v-for="item in sortedItemsList(listOfOrders, 'ordered')" class="order-item-obj" :key="item.orderID">
+        <OrderItem :order="item" @change-order-status="changeOrderStatus($event[0], $event[1])" />
       </div>
     </div>
   </div>

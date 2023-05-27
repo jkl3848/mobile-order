@@ -10,26 +10,17 @@ const emit = defineEmits(["changeOrderStatus"]);
 </script>
 <template>
   <div id="order-details">
-    <span id="order-item">{{ order.orderItem }}</span
-    ><span id="order-time">Time Ordered: {{ order.orderTime }}</span>
+    <span id="order-item">{{ order.orderItem }}</span><span id="order-time">Time Ordered: {{ order.orderTime }}</span>
   </div>
-  <!-- <div id="expanded-details" v-if="expandDetails">
-    Name: {{ order.name }}
-    Notes: {{ order.notes }}
-  </div> -->
+  <div id="expanded-details">
+    Name: {{ order.orderName }}
+    {{ order.phoneNumber }}
+  </div>
   <div>
-    <button
-      class="order-button"
-      id="start-button"
-      @click="emit('changeOrderStatus', [order, 'started'])"
-    >
+    <button class="order-button" id="start-button" @click="emit('changeOrderStatus', [order, 'started'])">
       Start
     </button>
-    <button
-      class="order-button"
-      id="complete-button"
-      @click="emit('changeOrderStatus', [order, 'completed'])"
-    >
+    <button class="order-button" id="complete-button" @click="emit('changeOrderStatus', [order, 'completed'])">
       Complete
     </button>
   </div>
