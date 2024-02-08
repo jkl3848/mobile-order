@@ -4,7 +4,6 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
 import OrderItem from "./OrderItem.vue";
-import ActionMenu from "./ActionMenu.vue";
 
 const db = getFirestore();
 const citiesRef = collection(db, "order-list");
@@ -68,8 +67,8 @@ function sortedItemsList(list, itemStatus) {
   var finalList;
 
   list.sort((a, b) => {
-    const timeA = a.orderTime ? a.orderTime.split(':') : [];
-    const timeB = b.orderTime ? b.orderTime.split(':') : [];
+    const timeA = a.orderTime ? a.orderTime.split(":") : [];
+    const timeB = b.orderTime ? b.orderTime.split(":") : [];
 
     for (let i = 0; i < 3; i++) {
       const valueA = Number(timeA[i]) || 0;
@@ -83,7 +82,7 @@ function sortedItemsList(list, itemStatus) {
     return 0;
   });
 
-  console.log(list)
+  console.log(list);
 
   if (itemStatus == "ordered") {
     finalList = list.filter((item) => {
@@ -146,127 +145,138 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <ActionMenu v-if="actionMenuOn" @close-action-menu="toggleActionMenu" />
+  <Dialog
+    v-model:visible="actionMenuOn"
+    modal
+    header="Vendor Actions"
+    :style="{ width: '25rem' }"
+    dismissable-mask="true"
+  >
+    <span class="p-text-secondary block mb-5">Actions go here...</span>
+  </Dialog>
+
   <div id="header">
-    <div>
-      <span id="welcome-text">Welcome Vendor</span>
-      <span>
-        Est. Wait Time: {{ waitTime }} minute{{ waitTime > 1 ? "s" : "" }}</span>
-    </div>
-    <div id="action-button">
-      <button @click="toggleActionMenu()">*</button>
-    </div>
+    <span id="welcome-text">Welcome Vendor</span>
+
+    <Button
+      id="action-button"
+      @click="toggleActionMenu()"
+      rounded
+      icon="pi pi-cog"
+    />
+
+    <span>
+      Est. Wait Time: {{ waitTime }} minute{{ waitTime > 1 ? "s" : "" }}</span
+    >
   </div>
 
   <div id="content" :class="actionMenuOn ? 'blur' : ''">
-    <div v-if="sortedItemsList(listOfOrders, 'started').length > 0" class="order-list" id="in-progress-orders">
-      <span class="order-list-header">{{ sortedItemsList(listOfOrders, "started").length }} Orders in
-        Progress</span>
-      <div v-for="item in sortedItemsList(listOfOrders, 'started')" class="order-item-obj"
-        :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'" :key="item.orderID">
-        <OrderItem :order="item" @change-order-status="changeOrderStatus($event[0], $event[1])" />
+    <div
+      v-if="sortedItemsList(listOfOrders, 'started').length > 0"
+      class="order-list"
+      id="in-progress-orders"
+    >
+      <div class="order-list-header">
+        {{ sortedItemsList(listOfOrders, "started").length }} Orders in Progress
+      </div>
+      <div
+        v-for="item in sortedItemsList(listOfOrders, 'started')"
+        class="order-item-obj"
+        :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'"
+        :key="item.orderID"
+      >
+        <OrderItem
+          class="order-item"
+          :order="item"
+          @change-order-status="changeOrderStatus($event[0], $event[1])"
+        />
       </div>
     </div>
 
-    <div v-if="sortedItemsList(listOfOrders, 'ordered').length > 0" class="order-list" id="orders">
-      <span class="order-list-header">{{ sortedItemsList(listOfOrders, "ordered").length }} Orders
-        Pending</span>
-      <div v-for="item in sortedItemsList(listOfOrders, 'ordered')" class="order-item-obj" :key="item.orderID">
-        <OrderItem :order="item" @change-order-status="changeOrderStatus($event[0], $event[1])" />
+    <div
+      v-if="sortedItemsList(listOfOrders, 'ordered').length > 0"
+      class="order-list"
+      id="orders"
+    >
+      <div class="order-list-header">
+        {{ sortedItemsList(listOfOrders, "ordered").length }} Orders Pending
+      </div>
+      <div
+        v-for="item in sortedItemsList(listOfOrders, 'ordered')"
+        class="order-item-obj"
+        :key="item.orderID"
+      >
+        <OrderItem
+          class="order-item"
+          :order="item"
+          @change-order-status="changeOrderStatus($event[0], $event[1])"
+        />
       </div>
     </div>
   </div>
 
   <div id="footer">
-    <button class="footer-button" id="manual-order-button">Manual Order</button>
-    <button class="footer-button" id="pause-order-button">Pause Orders</button>
+    <Button
+      class="footer-button"
+      id="manual-order-button"
+      label="Manual Order"
+    />
+    <Button
+      class="footer-button"
+      id="pause-order-button"
+      label="Pause Orders"
+      severity="danger"
+    />
   </div>
 </template>
 
 <style scoped>
 #header {
-  height: 80px;
-  background-color: rgb(38, 176, 84);
   width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-#content {
-  text-align: center;
-  margin: auto;
-  margin-top: 0px;
-  width: 80%;
-  background-color: white;
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-  padding-top: 1px;
-  padding-bottom: 85px;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-#footer {
   height: 80px;
-  background-color: gray;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  position: fixed;
-  bottom: 0px;
-  z-index: 100;
+  background-color: var(--green-700);
+  padding: 12px;
 }
 
 #welcome-text {
-  justify-content: center;
-  margin-left: 42%;
+  font-size: 48px;
 }
 
 #action-button {
-  justify-content: right;
-}
-
-.order-list {
-  margin-top: 30px;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  height: 56px;
+  width: 56px;
 }
 
 .order-list-header {
-  font-size: 60px;
+  width: 100%;
+  margin-top: 8px;
+  font-size: 36px;
+  text-align: center;
 }
 
-.order-item-obj {
-  border: 3px solid gray;
-  border-radius: 15px;
-  padding: 10px;
-  margin-top: 10px;
-  box-shadow: 0px 0px 5px rgb(99, 99, 99);
+#content {
+  margin-bottom: 84px;
 }
 
-.item-started {
-  border-color: rgb(48, 92, 195);
-}
+#footer {
+  position: fixed;
+  bottom: 0;
 
-.blur {
-  filter: blur(8px) !important;
+  width: 100%;
+  height: 80px;
+  background-color: var(--green-700);
+  padding: 12px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }
 
 .footer-button {
-  color: white;
-  height: 60px;
-  width: 350px;
-  margin: auto;
-  border-radius: 30px;
-  font-size: 20px;
-}
-
-#pause-order-button {
-  background-color: rgb(255, 139, 71);
-  border: 3px solid rgb(170, 92, 47);
-}
-
-#manual-order-button {
-  background-color: rgb(55, 189, 193);
-  border: 3px solid rgb(34, 116, 119);
+  width: 400px;
+  font-size: 30px;
 }
 </style>
