@@ -4,6 +4,7 @@ import { getFirestore } from "firebase/firestore";
 
 const db = getFirestore();
 
+var confirmOrder = $ref(false);
 var phoneNumber = $ref("");
 var invalidNumber = $ref(false);
 var itemForOrder = $ref("Cheeseburger");
@@ -17,38 +18,26 @@ const orderItemList = $ref([
     itemName: "Cheeseburger",
     itemNumber: "01",
     imagePath: "../mockup/images/cheeseburger.jpg",
-    selected: true,
+    inStock: true,
   },
   {
     itemName: "Drink",
     itemNumber: "02",
     imagePath: "../mockup/images/drink.jpg",
-    selected: false,
+    inStock: true,
   },
   {
     itemName: "Secret Item",
     itemNumber: "03",
     imagePath: "null",
-    selected: false,
+    inStock: false,
   },
 ]);
 
 function selectItem(itemIndex) {
-  var skip = false;
-  if (orderItemList[itemIndex].selected == true) {
-    skip = true;
-  }
-  for (let i = 0; i < orderItemList.length; i++) {
-    orderItemList[i].selected = false;
-  }
-  if (!skip) {
-    orderItemList[itemIndex].selected = true;
-  }
-
-  const selectedObject = orderItemList.find(obj => obj.selected === true);
-  console.log(selectedObject)
-  itemForOrder = selectedObject.itemName
-
+  const selectedObject = orderItemList[itemIndex];
+  console.log(selectedObject);
+  itemForOrder = selectedObject.itemName;
 }
 
 function phoneVerification() {
@@ -100,7 +89,7 @@ async function submitOrder() {
 
 function getCurrentTime() {
   const now = new Date();
-  const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+  const timeString = now.toLocaleTimeString("en-US", { hour12: false });
   return timeString;
 }
 </script>
@@ -108,115 +97,152 @@ function getCurrentTime() {
 <template>
   <div id="content">
     <div id="header">Booth Name</div>
+
     <div id="form">
-      <label class="user-input-label">Item: </label>
-
-      <table>
-        <tbody>
-          <tr v-for="(item, index) in orderItemList" :key="item.itemNumber">
-            <td v-if="index % 2 === 0" @click="selectItem(index)" :class="item.selected ? 'selected' : ''">
-              <div class="item-select">
-                <img :src="item.imagePath" class="item-image" />
-                <span>{{ item.itemName }}</span>
+      <DataView :value="orderItemList">
+        <template #list="slotProps">
+          <div>
+            <div
+              v-for="(item, index) in slotProps.items"
+              :key="index"
+              class="item-slot"
+              :class="index !== 0 ? 'bottom-top' : ''"
+            >
+              <div class="flex-row">
+                <img
+                  class="item-slot-image"
+                  :src="item.imagePath"
+                  :alt="item.itemName"
+                />
+                <div class="flex-column">
+                  <div class="item-title">
+                    {{ item.itemName }}
+                  </div>
+                  <div class="flex-column align-right">
+                    <Tag
+                      :value="item.inStock ? 'In Stock' : 'Out Of Stock'"
+                      :severity="item.inStock ? 'success' : 'danger'"
+                      class="stock-tag"
+                    ></Tag>
+                    <Button
+                      icon="pi pi-shopping-cart"
+                      label="Order"
+                      :disabled="!item.inStock"
+                      @click="
+                        selectItem(index);
+                        confirmOrder = true;
+                      "
+                      class="order-button"
+                    ></Button>
+                  </div>
+                </div>
               </div>
-            </td>
-            <td v-if="index % 2 === 0 && index < orderItemList.length - 1" @click="selectItem(index + 1)"
-              :class="orderItemList[index + 1].selected ? 'selected' : ''">
-              <div class="item-select">
-                <img :src="orderItemList[index + 1].imagePath" class="item-image" />
-                <span>{{ orderItemList[index + 1].itemName }}</span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div id="personal-info">
-        <div class="info-group">
-          <label class="user-input-label">Name: </label>
-          <input type="text" class="user-input" v-model="userName" />
-        </div>
-        <div class="info-group">
-          <label class="user-input-label">Phone Number: </label>
-          <input type="text" class="user-input" :class="invalidNumber ? 'invalid' : ''" v-model="phoneNumber"
-            @input="phoneVerification()" placeholder="(___)___-____" maxlength="13" />
-        </div>
+            </div>
+          </div>
+        </template>
+      </DataView>
 
-        <button @click="submitOrder()">Submit</button>
-      </div>
+      <Dialog
+        v-model:visible="confirmOrder"
+        modal
+        header="Vendor Actions"
+        :style="{ width: '25rem' }"
+        dismissable-mask="true"
+        id="order-dialog"
+      >
+        <div id="personal-info">
+          <div class="info-group flex-column">
+            <label for="username">Name</label>
+            <InputText
+              id="username"
+              v-model="userName"
+              aria-describedby="username-help"
+            />
+          </div>
+          <div class="info-group flex-column">
+            <label for="phonenumber">Phone Number</label>
+            <InputMask
+              id="phonenumber"
+              type="text"
+              class="user-input"
+              :class="invalidNumber ? 'invalid' : ''"
+              v-model="phoneNumber"
+              mask="(999) 999-9999"
+              placeholder="(999) 999-9999"
+              maxlength="13"
+            />
+          </div>
+
+          <Button @click="submitOrder()" label="Submit" />
+        </div>
+      </Dialog>
     </div>
   </div>
 </template>
 
 <style scoped>
-#content {
-  text-align: center;
-  margin: auto;
-  margin-top: 0px;
-  width: 80%;
-  background-color: white;
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+#header {
+  width: 100%;
+  height: 80px;
+  background-color: var(--green-700);
+  padding: 12px;
 }
 
-#header {
-  height: 80px;
-  background-color: rgb(38, 176, 84);
-  width: 100%;
+#order-dialog {
+}
+
+.item-slot {
+  height: 400px;
+  padding: 20px;
+}
+
+.item-slot-image {
+  height: 360px;
+  width: 360px;
+  border-radius: 20px;
+}
+
+.bottom-top {
+  border-top: 1px solid var(--bluegray-500);
+}
+
+.flex-row {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
 
-#form {
+.flex-column {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
-table {
-  margin: auto;
+.item-title {
+  font-size: 48px;
+  padding-left: 24px;
 }
 
-td {
-  border: 2px solid black;
+.stock-tag {
+  width: 200px;
+  height: 80px;
+  font-size: 24px;
 }
 
-td.selected {
-  border: 4px solid green;
+.order-button {
+  width: 200px;
+  height: 80px;
+  font-size: 36px;
+
+  margin-top: 12px;
 }
 
-#personal-info {
-  margin-top: 50px;
+.align-right {
+  align-items: end;
 }
 
 .info-group {
-  width: 60%;
-  margin: auto;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding-bottom: 10px;
-}
-
-.user-input {
-  width: 250px;
-  font-size: 30px;
-}
-
-.user-input-label {
-  font-size: 30px;
-}
-
-.item-image {
-  width: 200px;
-  height: 200px;
-}
-
-.item-select {
-  display: flex;
-  flex-direction: column;
-  margin: auto;
-}
-
-.invalid {
-  border: 1px solid red;
+  font-size: 36px;
+  padding-bottom: 24px;
 }
 </style>
