@@ -22,6 +22,7 @@
     "build": "vite build"
   },
   "devDependencies": {
-    "@vue-macros/reactivity-transform": "^0.4.3"
+    "@vue-macros/reactivity-transform": "^0.4.3",
+    "unplugin-vue-macros": "^2.7.10"
   }
 }
