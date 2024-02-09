@@ -20,5 +20,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build"
+  },
+  "devDependencies": {
+    "@vue-macros/reactivity-transform": "^0.4.3"
   }
 }
