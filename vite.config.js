@@ -1,15 +1,10 @@
 import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
+import ReactivityTransform from "@vue-macros/reactivity-transform/vite";
 
 export default defineConfig({
   base: "./",
-  plugins: [
-    vue({
-      reactivityTransform: true,
-    }),
-    cssInjectedByJsPlugin(),
-  ],
+  plugins: [ReactivityTransform(), cssInjectedByJsPlugin()],
   // resolve: {
   //   alias: {
   //     vue: "vue/dist/vue.esm-bundler.js",
