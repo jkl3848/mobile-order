@@ -6,57 +6,12 @@ import { getFirestore } from "firebase/firestore";
 import OrderItem from "./OrderItem.vue";
 
 const db = getFirestore();
-const citiesRef = collection(db, "order-list");
+const ordersCollection = collection(db, "order-list");
 
 var actionMenuOn = $ref(false);
 var waitTime = $ref(0);
 var vendorID = "0001";
 var listOfOrders = $ref([]);
-
-// var test = $ref([
-//   {
-//     orderNumber: "00001",
-//     item: "Cheeseburger",
-//     name: "Steve",
-//     number: "100",
-//     status: "started",
-//     orderTime: "5:00:00",
-//   },
-
-//   {
-//     orderNumber: "00002",
-//     item: "Cheeseburger",
-//     name: "John",
-//     number: "100",
-//     status: "started",
-//     orderTime: "5:00:37",
-//   },
-
-//   {
-//     orderNumber: "00003",
-//     item: "Soda",
-//     name: "Ted",
-//     number: "100",
-//     status: "ordered",
-//     orderTime: "5:02:08",
-//   },
-//   {
-//     orderNumber: "00004",
-//     item: "Soda",
-//     name: "Sarah",
-//     number: "100",
-//     status: "ordered",
-//     orderTime: "5:02:55",
-//   },
-//   {
-//     orderNumber: "00005",
-//     item: "Cheeseburger",
-//     name: "Alex",
-//     number: "100",
-//     status: "ordered",
-//     orderTime: "5:04:023",
-//   },
-// ]);
 
 function toggleActionMenu() {
   actionMenuOn = !actionMenuOn;
@@ -131,7 +86,7 @@ onMounted(() => {
 });
 
 onBeforeMount(async () => {
-  var q = query(citiesRef, where("vendor", "==", "0001"));
+  var q = query(ordersCollection, where("vendor", "==", vendorID));
 
   var holder = await getDocs(q);
   holder.forEach((doc) => {
