@@ -1,6 +1,13 @@
 <script setup>
 import { onBeforeMount, onMounted, watch } from "vue";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
 import OrderItem from "./OrderItem.vue";
@@ -10,51 +17,55 @@ const ordersCollection = collection(db, "order-list");
 
 var actionMenuOn = $ref(false);
 var waitTime = $ref(0);
-var vendorID = "0001";
+var vendorID = "1111";
 var listOfOrders = $ref([]);
+
+const displayList = $computed(() => {
+  return listOfOrders.sort((a, b) => a.orderedTime - b.orderedTime);
+});
 
 function toggleActionMenu() {
   actionMenuOn = !actionMenuOn;
 }
 
-function sortedItemsList(list, itemStatus) {
-  console.log(list);
-  var finalList;
+// function sortedItemsList(list, itemStatus) {
+//   console.log(list);
+//   var finalList;
 
-  list.sort((a, b) => {
-    const timeA = a.orderTime ? a.orderTime.split(":") : [];
-    const timeB = b.orderTime ? b.orderTime.split(":") : [];
+//   list.sort((a, b) => {
+//     const timeA = a.orderTime ? a.orderTime.split(":") : [];
+//     const timeB = b.orderTime ? b.orderTime.split(":") : [];
 
-    for (let i = 0; i < 3; i++) {
-      const valueA = Number(timeA[i]) || 0;
-      const valueB = Number(timeB[i]) || 0;
+//     for (let i = 0; i < 3; i++) {
+//       const valueA = Number(timeA[i]) || 0;
+//       const valueB = Number(timeB[i]) || 0;
 
-      if (valueA !== valueB) {
-        return valueA - valueB;
-      }
-    }
+//       if (valueA !== valueB) {
+//         return valueA - valueB;
+//       }
+//     }
 
-    return 0;
-  });
+//     return 0;
+//   });
 
-  console.log(list);
+//   console.log(list);
 
-  if (itemStatus == "ordered") {
-    finalList = list.filter((item) => {
-      return item.itemStatus === "ordered";
-    });
-  } else if (itemStatus == "started") {
-    finalList = list.filter((item) => {
-      return item.itemStatus === "started";
-    });
-  } else if (itemStatus == "allInProg") {
-    finalList = list.filter((item) => {
-      return item.itemStatus !== "completed";
-    });
-  }
+//   if (itemStatus == "ordered") {
+//     finalList = list.filter((item) => {
+//       return item.itemStatus === "ordered";
+//     });
+//   } else if (itemStatus == "started") {
+//     finalList = list.filter((item) => {
+//       return item.itemStatus === "started";
+//     });
+//   } else if (itemStatus == "allInProg") {
+//     finalList = list.filter((item) => {
+//       return item.itemStatus !== "completed";
+//     });
+//   }
 
-  return finalList;
-}
+//   return finalList;
+// }
 
 function orderIsStarted(item) {
   if (item.itemStatus === "started") {
@@ -63,40 +74,57 @@ function orderIsStarted(item) {
   return false;
 }
 
-function changeOrderStatus(item, status) {
-  console.log("Changing item to " + status);
+async function changeOrderStatus(item, newStatus) {
+  console.log("Changing item to " + newStatus);
   let foundObj = listOfOrders.find((obj) => obj.orderID === item.orderID);
 
+  console.log(foundObj);
   if (foundObj) {
-    foundObj.itemStatus = status;
+    const orderRef = doc(ordersCollection, foundObj.id);
+
+    // Update the itemStatus field of the specified order document
+    await updateDoc(orderRef, {
+      itemStatus: newStatus,
+    });
+
+    refreshData();
   }
 }
-watch(
-  () => listOfOrders,
-  (newVal, oldVal) => {
-    waitTime = Math.ceil(
-      sortedItemsList(listOfOrders, "allInProg").length * 0.5
-    );
-  },
-  { deep: true }
-);
+// watch(
+//   () => listOfOrders,
+//   (newVal, oldVal) => {
+//     waitTime = Math.ceil(
+//       sortedItemsList(listOfOrders, "allInProg").length * 0.5
+//     );
+//   },
+//   { deep: true }
+// );
 
 onMounted(() => {
-  waitTime = Math.ceil(sortedItemsList(listOfOrders, "allInProg").length * 0.5);
+  waitTime = Math.ceil(
+    displayList.filter((item) => item.itemStatus !== "completed").length * 0.5
+  );
 });
 
 onBeforeMount(async () => {
-  var q = query(ordersCollection, where("vendor", "==", vendorID));
+  refreshData();
+});
 
-  var holder = await getDocs(q);
+async function refreshData() {
+  listOfOrders = [];
+  const q = query(ordersCollection, where("vendor", "==", vendorID));
+
+  const holder = await getDocs(q);
   holder.forEach((doc) => {
     // doc.data() is never undefined for query doc snapshots
     console.log(doc.id, " => ", doc.data());
-    listOfOrders.push(doc.data());
+    const finalObj = doc.data();
+    finalObj.id = doc.id;
+    listOfOrders.push(finalObj);
   });
 
   console.log(listOfOrders);
-});
+}
 </script>
 
 <template>
@@ -127,15 +155,18 @@ onBeforeMount(async () => {
 
   <div id="content" :class="actionMenuOn ? 'blur' : ''">
     <div
-      v-if="sortedItemsList(listOfOrders, 'started').length > 0"
+      v-if="displayList.find((item) => item.itemStatus === 'started')"
       class="order-list"
       id="in-progress-orders"
     >
       <div class="order-list-header">
-        {{ sortedItemsList(listOfOrders, "started").length }} Orders in Progress
+        {{ displayList.filter((item) => item.itemStatus === "started").length }}
+        Orders in Progress
       </div>
       <div
-        v-for="item in sortedItemsList(listOfOrders, 'started')"
+        v-for="item in displayList.filter(
+          (item) => item.itemStatus === 'started'
+        )"
         class="order-item-obj"
         :class="orderIsStarted(item) ? 'item-started' : 'item-not-started'"
         :key="item.orderID"
@@ -149,15 +180,18 @@ onBeforeMount(async () => {
     </div>
 
     <div
-      v-if="sortedItemsList(listOfOrders, 'ordered').length > 0"
+      v-if="displayList.find((item) => item.itemStatus === 'ordered')"
       class="order-list"
       id="orders"
     >
       <div class="order-list-header">
-        {{ sortedItemsList(listOfOrders, "ordered").length }} Orders Pending
+        {{ displayList.filter((item) => item.itemStatus === "ordered").length }}
+        Orders Pending
       </div>
       <div
-        v-for="item in sortedItemsList(listOfOrders, 'ordered')"
+        v-for="item in displayList.filter(
+          (item) => item.itemStatus === 'ordered'
+        )"
         class="order-item-obj"
         :key="item.orderID"
       >

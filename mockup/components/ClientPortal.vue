@@ -14,7 +14,6 @@ var itemForOrder = $ref("");
 var userName = $ref("");
 
 var vendorID = "1111";
-var orderID = $ref("0001");
 
 let vendorInfo = $ref();
 const orderItemList = $ref([
@@ -55,24 +54,17 @@ async function submitOrder() {
   try {
     const docRef = await addDoc(collection(db, "order-list"), {
       vendor: vendorID,
-      orderID: orderID,
       orderItem: itemForOrder,
       orderName: userName,
       phoneNumber: phoneNumber,
       itemStatus: "ordered",
-      orderTime: getCurrentTime(),
+      orderTime: new Date().getTime(),
     });
     console.log("Document written with ID: ", docRef.id);
     orderID++;
   } catch (e) {
     console.error("Error adding document: ", e);
   }
-}
-
-function getCurrentTime() {
-  const now = new Date();
-  const timeString = now.toLocaleTimeString("en-US", { hour12: false });
-  return timeString;
 }
 
 onBeforeMount(async () => {
