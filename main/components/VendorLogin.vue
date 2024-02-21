@@ -7,36 +7,37 @@ const route = useRoute();
 const router = useRouter();
 
 function verifyLogin() {
+  router.push({
+    name: "VendorPortal",
+    params: { vendorId: "1111" },
+  });
+  // var username = document.getElementById("login-field-username").value;
+  // var password = document.getElementById("login-field-password").value;
+  // var userType = "";
+  // var id;
 
-    router.push({
-        name: "VendorPortal",
-    });
-    // var username = document.getElementById("login-field-username").value;
-    // var password = document.getElementById("login-field-password").value;
-    // var userType = "";
-    // var id;
+  // console.log(username);
+  // console.log(password);
 
-    // console.log(username);
-    // console.log(password);
+  // var userInfo = logins.find((obj) => obj.user === username);
 
-    // var userInfo = logins.find((obj) => obj.user === username);
+  // console.log(userInfo);
+  // if (userInfo.password === password) {
+  //   id = userInfo.id;
+  //   userType = userInfo.type;
 
-    // console.log(userInfo);
-    // if (userInfo.password === password) {
-    //   id = userInfo.id;
-    //   userType = userInfo.type;
+  //   var loginPath = `../vendor/${userType}/vendorMain.html`;
 
-    //   var loginPath = `../vendor/${userType}/vendorMain.html`;
-
-    //   window.location.href = loginPath;
-    // } else {
-    // }
+  //   window.location.href = loginPath;
+  // } else {
+  // }
 }
 
 function gotToClient() {
-    router.push({
-        name: "ClientPortal",
-    });
+  router.push({
+    name: "ClientPortal",
+    params: { vendorId: "1111" },
+  });
 }
 
 // onMounted(() => {
@@ -44,12 +45,11 @@ function gotToClient() {
 //     var loginButton = document.getElementById("login-button");
 //     loginButton.addEventListener("click", verifyLogin);
 // })
-
 </script>
 
 <template>
-    <div id="content">
-        <!-- <div id="welcome">Welcome to the APS Mobile Order System</div>
+  <div id="content">
+    <!-- <div id="welcome">Welcome to the APS Mobile Order System</div>
 
         <div id="login-area">
             <label for="login-field-username">Username:</label>
@@ -59,24 +59,24 @@ function gotToClient() {
 
             <button id="login-button">Login</button>
         </div> -->
-        <div>
-            <button @click="verifyLogin()">Vendor</button>
-            <button @click="gotToClient()">Client</button>
-        </div>
+    <div>
+      <button @click="verifyLogin()">Vendor</button>
+      <button @click="gotToClient()">Client</button>
     </div>
+  </div>
 </template>
 
 <style scoped>
 #content {
-    padding-top: 20px;
-    padding-bottom: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 button {
-    height: 60px;
-    width: 350px;
-    margin: auto;
-    border-radius: 30px;
-    font-size: 20px;
+  height: 60px;
+  width: 350px;
+  margin: auto;
+  border-radius: 30px;
+  font-size: 20px;
 }
 </style>

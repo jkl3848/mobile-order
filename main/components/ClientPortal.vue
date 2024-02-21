@@ -3,9 +3,13 @@ import { onBeforeMount, onMounted, watch } from "vue";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
+import { useRoute } from "vue-router";
+
 const db = getFirestore();
 const itemCollection = collection(db, "item-list");
 const vendorCollection = collection(db, "vendor-list");
+
+const route = useRoute();
 
 var confirmOrder = $ref(false);
 var phoneNumber = $ref("");
@@ -13,7 +17,7 @@ var invalidNumber = $ref(false);
 var itemForOrder = $ref("");
 var userName = $ref("");
 
-var vendorID = "1111";
+let vendorID = $ref();
 
 let vendorInfo = $ref();
 const orderItemList = $ref([
@@ -68,6 +72,7 @@ async function submitOrder() {
 }
 
 onBeforeMount(async () => {
+  vendorID = route.params.vendorId;
   await getItems();
   await getVendorInfo();
 });

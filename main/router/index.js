@@ -5,7 +5,7 @@ import ClientPortal from "../components/ClientPortal.vue";
 
 const routes = [
   {
-    path: "/vendorportal",
+    path: "/vendorportal/:vendorId",
     name: "VendorPortal",
     component: VendorPortal,
   },
@@ -15,7 +15,7 @@ const routes = [
     component: VendorLogin,
   },
   {
-    path: "/clientportal",
+    path: "/clientportal/:vendorId",
     name: "ClientPortal",
     component: ClientPortal,
   },

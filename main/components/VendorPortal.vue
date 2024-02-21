@@ -10,6 +10,8 @@ import {
 } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
+import { useRoute } from "vue-router";
+
 import OrderItem from "./OrderItem.vue";
 
 const db = getFirestore();
@@ -17,10 +19,12 @@ const ordersCollection = collection(db, "order-list");
 const vendorCollection = collection(db, "vendor-list");
 const itemCollection = collection(db, "item-list");
 
+const route = useRoute();
+
 let actionMenuOn = $ref(false);
 let vendorOpen = $ref();
 var waitTime = $ref(0);
-var vendorID = "1111";
+let vendorID = $ref();
 
 let vendorDocId = $ref();
 let vendorInfo = $ref();
@@ -67,6 +71,7 @@ onMounted(() => {
 });
 
 onBeforeMount(async () => {
+  vendorID = route.params.vendorId;
   refreshData();
   getVendorInfo();
   getItems();
