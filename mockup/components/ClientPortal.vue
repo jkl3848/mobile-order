@@ -157,6 +157,8 @@ async function getVendorInfo() {
         header=" "
         :style="{ width: '50rem', height: '40rem' }"
         dismissable-mask="true"
+        block-scroll="true"
+        draggable="false"
         id="order-dialog"
       >
         <div id="order-dialog-item">Order: {{ itemForOrder }}</div>
