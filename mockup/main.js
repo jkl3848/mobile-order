@@ -10,6 +10,8 @@ import DataView from "primevue/dataview";
 import Tag from "primevue/tag";
 import InputText from "primevue/inputtext";
 import InputMask from "primevue/inputmask";
+import ToggleButton from "primevue/ToggleButton";
+import SelectButton from "primevue/selectbutton";
 
 import App from "./App.vue";
 import router from "./router";
@@ -25,6 +27,8 @@ app.component("DataView", DataView);
 app.component("Tag", Tag);
 app.component("InputText", InputText);
 app.component("InputMask", InputMask);
+app.component("ToggleButton", ToggleButton);
+app.component("SelectButton", SelectButton);
 
 app.use(router);
 
