@@ -20,13 +20,13 @@ const orderItemList = $ref([
   // {
   //   itemName: "Cheeseburger",
   //   itemNumber: "01",
-  //   imagePath: "../mockup/images/cheeseburger.jpg",
+  //   imagePath: "../main/images/cheeseburger.jpg",
   //   inStock: true,
   // },
   // {
   //   itemName: "Drink",
   //   itemNumber: "02",
-  //   imagePath: "../mockup/images/drink.jpg",
+  //   imagePath: "../main/images/drink.jpg",
   //   inStock: true,
   // },
   // {
